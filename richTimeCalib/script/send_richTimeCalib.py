@@ -29,7 +29,7 @@ aScript.append(RICHTIMECALIB + "/script/run_TC.sh")
 maps = [RICHTIMECALIB + "/maps/SspRich_mapCHANNEL2PIXEL.txt"]
 maps.append(RICHTIMECALIB + "/maps/SspRich_mapFIBER2PMT_sortbyPMT.txt")
 ofile_pref = "RichTimeCalib_"
-WF    = "rich_timeCalib"
+WF    = "RICH_TC"
 RN    = 0
 TRACK = "analysis"
 BS = 10  # hist jobs bunch size
@@ -189,7 +189,7 @@ def main():
     else:
         RN = str(RN)
 
-    WF += WF + "_" + str(RN)
+    WF += "_" + str(RN)
     outdir_pref += "/" + RN
     create_wf()
     flist_flat = []
