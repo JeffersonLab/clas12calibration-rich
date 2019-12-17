@@ -170,26 +170,26 @@ def run_wf():
 
 def main():
     global WF, RN, outdir_pref, MAXJOBS, BS
-    if len(argv)<2: 
-        print "A directory with calibration files or filelist must be supplied"
+    if len(argv)!=3: 
+        print "A directory with calibration files or filelist must be supplied together with a run number"
+        print argv[0] + " filelist.txt <RN>"
         exit (1)
     if not os.path.exists(argv[1]):
         print "The file or path " + argv[1] + " does not exist"
         exit (1)
 
-    if len(argv) == 3:
-        try:
-            RN = int(argv[2])
-        except ValueError:
-            print "The run number must be an integer!. You supplied " + argv[2]
-            exit(0)
+    try:
+        RN = int(argv[2])
+    except ValueError:
+        print "The run number must be an integer!. You supplied " + argv[2]
+        exit(0)
 
     if RN == 0:
         RN = "" 
     else:
         RN = str(RN)
 
-
+    WF += WF + "_" + str(RN)
     outdir_pref += "/" + RN
     create_wf()
     flist_flat = []
