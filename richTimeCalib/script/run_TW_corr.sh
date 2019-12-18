@@ -30,7 +30,8 @@ else
 fi
 ls
 
-hadd $RFNAME *__*.root
+rhadd=`root-config --bindir`/hadd
+$rhadd $RFNAME *__*.root
 
 ./richTimeWalks $RFNAME $RN
 ls
