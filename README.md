@@ -1,3 +1,3 @@
 # RICH calibration tools
 ## richTimeCalib
-package to obtain time calibration parameter of the rich in a given run.
+package to obtain the RICH time calibration parameters in a given run.
