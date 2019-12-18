@@ -32,7 +32,7 @@ AR	  = ar
 ARFLAGS	  = -cvr #create,verbose,quick (don't check for replacement, otherwise use r instead)
 
 
-all: checkdir bin/richTiming bin/richTiming_expert bin/richTimeOffsets bin/richTimeWalks bin/richTimeCheck
+all: checkdir bin/richTiming bin/richTimeOffsets bin/richTimeWalks bin/richTimeCheck
 
 checkdir:
 	@if test ! -d .obj; then mkdir .obj; fi
