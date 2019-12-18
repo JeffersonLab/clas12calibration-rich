@@ -10,7 +10,7 @@ This package contains a set of tools to extract time calibration parameters for 
 git clone https://github.com/JeffersonLab/clas12calibration-rich
 cd clas12calibration-rich/richTimeCalib
 
-# use the script depending on your system setenv.csh or setenv.sh
+# use the script depending on your system, setenv.csh or setenv.sh
 source script/setenv.csh 
 make
 make install
