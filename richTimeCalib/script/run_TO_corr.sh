@@ -10,8 +10,7 @@
 # [RN]     = Optional parameter, run number.
 #
 ###################################
-source /group/clas12/packages/setup.csh
-module load clas12/pro
+source setenv.sh
 
 outdir=$1
 

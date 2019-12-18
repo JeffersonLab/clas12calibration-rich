@@ -12,8 +12,7 @@
 # [RN]     = Optional parameter, run number.
 #
 ###################################
-source /group/clas12/packages/setup.csh
-module load clas12/pro
+source setenv.sh
 
 ### Prefix of filenames
 FILEPREFIX="calib_clas_00"

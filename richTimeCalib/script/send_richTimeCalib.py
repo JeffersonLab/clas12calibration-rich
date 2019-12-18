@@ -28,6 +28,7 @@ aScript.append(RICHTIMECALIB + "/script/run_TW_corr.sh")
 aScript.append(RICHTIMECALIB + "/script/run_TC.sh")
 maps = [RICHTIMECALIB + "/maps/SspRich_mapCHANNEL2PIXEL.txt"]
 maps.append(RICHTIMECALIB + "/maps/SspRich_mapFIBER2PMT_sortbyPMT.txt")
+envscript = RICHTIMECALIB + "/script/setenv.sh"
 ofile_pref = "RichTimeCalib_"
 WF    = "RICH_TC"
 RN    = 0
@@ -61,7 +62,7 @@ def import_flist(fname):
 
 ##### add histogram job to workflow
 def add_hist_job(wf,fnl,phase=0,c=0):
-    global outdir_pref, appHist, scriptHist, RN
+    global outdir_pref, appHist, scriptHist, RN, envscript
     script = scriptHist
     jname = wf + "_" + "ph" + str(phase) + "_" + str(c)
     size = 0
@@ -76,6 +77,7 @@ def add_hist_job(wf,fnl,phase=0,c=0):
     cmd += " -input " + script.split("/")[-1] + " file:" + script
     cmd += " -input " + maps[0].split("/")[-1] + " file:" + maps[0]
     cmd += " -input " + maps[1].split("/")[-1] + " file:" + maps[1]
+    cmd += " -input " + envscript.split("/")[-1] + " file:" + envscript
 
     for fname in fnl:
         cmd += " -input " + fname.split("/")[-1] + " file:" + fname
@@ -97,7 +99,7 @@ def add_hist_job(wf,fnl,phase=0,c=0):
 
 #### add analysis job ##########################
 def add_ana_job(wf,flist,phase=0):
-    global outdir_pref, aBin, aScript, RN
+    global outdir_pref, aBin, aScript, RN, envscript
     #    size = 24*150
     size = 24*2
     cmd  = "swif add-job -workflow " + wf + " -ram 550mb -project clas12 -time 6h -disk " + "{0:.0f}".format(size) + "mb "
@@ -114,6 +116,8 @@ def add_ana_job(wf,flist,phase=0):
 
     cmd += " -input " + maps[0].split("/")[-1] + " file:" + maps[0]
     cmd += " -input " + maps[1].split("/")[-1] + " file:" + maps[1]
+
+    cmd += " -input " + envscript.split("/")[-1] + " file:" + envscript
 
     jname = wf + "_" + "ph" + str(phase) 
 

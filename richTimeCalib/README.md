@@ -5,17 +5,20 @@ This package contains a set of tools to extract time calibration parameters for 
 * Hipo4 c++ installed and environments variables ```HIPO4LIB``` and  ```HIPO4INC``` pointing to the path with the hipo4 library and headers (*.h) respectively
 * Root version >= 5.34
 
-## Getting ready
+## Getting ready for running on farm
 ```
-git clone https://github.com/orsosa/richTimeCalib
-cd richTimeCalib
+git clone https://github.com/JeffersonLab/clas12calibration-rich
+cd clas12calibration-rich/richTimeCalib
+
+# use the script depending on your system setenv.csh or setenv.sh
+source script/setenv.csh 
 make
 make install
 setenv RICHTIMECALIB `pwd`
 setenv RICHTIMECALIB_OUTPATH <output-path>
 ```
 add the enviroments variables ```RICHTIMECALIB``` and ```RICHTIMECALIB_OUTPATH``` to your login script.
-A folder for each run number will be created under the path ```RICHTIMECALIB_OUTPATH```
+Once you run the programs a folder for each run number will be created under the path ```RICHTIMECALIB_OUTPATH```
 
 
 ## Use
@@ -63,11 +66,8 @@ After compilation two folders are created ```bin/``` and ```.obj/```
 
 **A:**  you can add time to the problematic jobs doing ```swif modify-jobs rich_timeCalib -time add 3h -problems AUGER-TIMEOUT```
 
-**Q:** How to avoid the jobs that have finished with errors like, SWIF-USER-NON-ZERO?
+**Q:** How to avoid the jobs that have finished with errors like, SWIF-USER-NON-ZERO in phase 0?
 
 **A:**  you can exclude from your input list files with small size. Probably these files are corrupted from reconstruction.
-
-
-
   
   
