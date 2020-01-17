@@ -258,6 +258,12 @@ int main(int argc, char* argv[]) {
 		      DTimeCorr = MeasPhotonTimeCorr - CalcPhotonTime;
 		    }
 
+		    /* use calibrated measured time */
+		    if (iCalibratedTime){
+		      double MeasPhotonTimeCorr = RICH__hits_time;
+		      DTimeCorr = MeasPhotonTimeCorr - CalcPhotonTime;
+		    }
+
 		    sprintf(name, "hDTimeCorr");
 		    gDirectory->GetObject(name, h2);
 		    h2->Fill(absChannel, DTimeCorr);

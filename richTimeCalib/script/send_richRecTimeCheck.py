@@ -19,18 +19,14 @@ if RICHTIMECALIB_OUTPATH == "":
 ############## global setting ###########
 outdir_pref = RICHTIMECALIB_OUTPATH
 appHist   = RICHTIMECALIB + "/bin/richTiming"
-aBin = [RICHTIMECALIB + "/bin/richTimeOffsets"]
-aBin.append(RICHTIMECALIB + "/bin/richTimeWalks")
-aBin.append(RICHTIMECALIB + "/bin/richTimeCheck")
-scriptHist= RICHTIMECALIB + "/script/run_richTiming.sh"
-aScript  = [RICHTIMECALIB + "/script/run_TO_corr.sh"]
-aScript.append(RICHTIMECALIB + "/script/run_TW_corr.sh")
-aScript.append(RICHTIMECALIB + "/script/run_TC.sh")
+aBin = [RICHTIMECALIB + "/bin/richTimeCheck"]
+scriptHist= RICHTIMECALIB + "/script/run_richTimingRecTimeCheck.sh"
+aScript  = [RICHTIMECALIB + "/script/run_TC.sh"]
 maps = [RICHTIMECALIB + "/maps/SspRich_mapCHANNEL2PIXEL.txt"]
 maps.append(RICHTIMECALIB + "/maps/SspRich_mapFIBER2PMT_sortbyPMT.txt")
 envscript = RICHTIMECALIB + "/script/setenv.sh"
 ofile_pref = "RichTimeCalib_"
-WF    = "RICH_TC"
+WF    = "RICH_RecTimeCheck"
 RN    = 0
 TRACK = "analysis"
 BS = 10  # hist jobs bunch size
@@ -82,18 +78,14 @@ def add_hist_job(wf,fnl,phase=0,c=0):
     for fname in fnl:
         cmd += " -input " + fname.split("/")[-1] + " file:" + fname
     T = int(phase/2)
-    corr_type = ["Offsets","Walks"]
-    if T > 0:
-        for k in range(T,0,-1):
-            cmd += " -input richTime" + corr_type[k-1] + "_ccdb_" + RN + ".out" + " file:" + outdir_pref + "/T" + corr_type[k-1] + "/richTime" + corr_type[k-1] + "_ccdb_" + RN + ".out"
 
-    outdir = outdir_pref + "/T" + str(T)
+    outdir = outdir_pref + "/TC"
     checkdir(outdir)
 
     outpref = fnl[0]
     outpref = outpref.split("/")[-1].replace(".hipo","-bunch")
 
-    cmd += " ./" + script.split("/")[-1] + " " + str(T) +  " " + outdir + " " + outpref + " " + RN
+    cmd += " ./" + script.split("/")[-1] + " " + outdir + " " + outpref + " " + RN
     if DEBUG : print (cmd)
     subprocess.call(cmd,shell=True)
 
@@ -106,9 +98,8 @@ def add_ana_job(wf,flist,phase=0):
     cmd += " -phase " + str(phase)
     cmd += " -shell /bin/bash" 
 
-    T = int((phase-1)/2)
-    script = aScript[T]
-    app = aBin[T]
+    script = aScript[0]
+    app = aBin[0]
 
     cmd += " -input " + app.split("/")[-1] + " file:" + app
     cmd += " -input " + script.split("/")[-1] + " file:" + script
@@ -120,9 +111,9 @@ def add_ana_job(wf,flist,phase=0):
 
     jname = wf + "_" + "ph" + str(phase) 
 
-    corr_type = ["TOffsets","TWalks","TCheck"]
-    outdir = outdir_pref + "/" + corr_type[T]
-    jname += "_" + corr_type[T]
+    corr_type = ["TRecCheck"]
+    outdir = outdir_pref + "/" + corr_type[0]
+    jname += "_" + corr_type[0]
 
     cmd += " -name " + jname
 
@@ -132,7 +123,7 @@ def add_ana_job(wf,flist,phase=0):
     for fnl in flist:
         fname = fnl[0]
         fname = fname.split("/")[-1]
-        fname = outdir_pref + "/T"+ str(T) +"/" + fname.replace(".hipo","-bunch") + "__RichTimeCalibE_" + RN + "_" + str(T) +".root"
+        fname = outdir_pref + "/TC" + "/" + fname.replace(".hipo","-bunch") + "__RichTimeCalibE_" + RN + "_C.root"
         cmd += " -input " + fname.split("/")[-1] + " file:" + fname
         c +=1
         if c>= MAXJOBS and DEBUG: break
@@ -207,27 +198,7 @@ def main():
     flist = [flist_flat[x*BS:(x+1)*BS] for x in range( -(-len(flist_flat) // BS ) )]
     ##### Setting jobs phase ###########
     phase = 0
-    ##### Putting jobs to make histograms without correction ####
-    add_hist_job_bunch(flist,phase)
-
-    ##### Setting jobs phase ###########
-    phase +=1
-    #### Putting jobs to make TO corrections ####
-    add_ana_job(WF,flist,phase)
-
-    ##### Setting jobs phase ###########
-    phase +=1
-    #### Putting jobs to make histogram with TO corrections ####
-    add_hist_job_bunch(flist,phase)
-
-    ##### Setting jobs phase ###########
-    phase +=1
-    #### Putting jobs to make TW corrections ####
-    add_ana_job(WF,flist,phase)
-
-    ##### Setting jobs phase ###########
-    phase +=1
-    #### Putting jobs to make histogram with TO and TW corrections ####
+    ##### Putting jobs to make histograms using rec time (hit time) ####
     add_hist_job_bunch(flist,phase)
 
     ##### Setting jobs phase ###########
