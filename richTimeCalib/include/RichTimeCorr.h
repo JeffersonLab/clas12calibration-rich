@@ -2,12 +2,12 @@
 /* Time offset correction per channel */
 extern int RunNumber;
 double TimeOffset[nPMTS][nANODES];
-void LoadTimeOffsets();
+void LoadTimeOffsets(TString filename = "");
 
 /* time walk correction per PMT */
 #define nTimeWalkPar 4
 double TimeWalkParameter[nPMTS][nTimeWalkPar];
-void LoadTimeWalkPars();
+void LoadTimeWalkPars(TString filename = "");
 
 /* Total correction */
 void InitTimeCorrections();
@@ -16,67 +16,88 @@ double GetCorrectedTime(int pmt, int anode, double dtime, double duration);
 
 
 /* ========================================= */
-void LoadTimeOffsets()
+void LoadTimeOffsets(TString filename)
 {
   /* Loading the time offset correction */
-  FILE *fIn;
+  std::ifstream fIn;
+  std::stringstream ss;
+  char aux[500];
+  TString line;
+
   int sector, pmt, anode;
 
   /* Reading the corrections */
-  TString filename = Form("richTimeOffsets_ccdb_%d.out",RunNumber);
+  if (filename=="")
+    filename   = Form("richTimeOffsets_ccdb_%d.out",RunNumber);
   std::cout <<"correction file: "<< filename << std::endl;
-  fIn = fopen(filename.Data(), "r");
-  if (fIn) {
-    printf("Reading time offset corrections \n");
-
-    for (int p=0; p<nPMTS; p++) {
-      
+  fIn.open(filename.Data());
+  if (!fIn.is_open()){
+    printf("ERROR: Cannot read time offset corrections, set to 0\n");
+    exit(1);
+  }
+  printf("Reading time offset corrections \n");
+  while (fIn.good()) {
+    fIn.getline(aux,500);
+    line = aux;
+    if (!(line[0]=='#'|| line.Length()==0)) break;
+  }
+  for (int p=0; p<nPMTS; p++) {
       for (int a=0; a<nANODES; a++) {
-	fscanf(fIn, "%d %d %d %lf", &sector, &pmt, &anode, &TimeOffset[p][a]);
-	//printf("%d %d %lf\n", p+1, a+1, TimeOffset[p][a]);
+	line=aux;
+	ss<<line;
+	ss>>sector>>pmt>>anode>>TimeOffset[p][a];
+	ss.clear();
+	fIn.getline(aux,500);
       }
-
-    }
+      
+  }
     
-    fclose(fIn);
-  }
-  else {
-    printf("WARNING: Cannot read time offset corrections, set to 0\n");
-  }
-  
+  fIn.close(); 
  
   return;
 }
+
 /* --------------------------------- */
-void LoadTimeWalkPars()
+void LoadTimeWalkPars(TString filename)
 {
   /* Loading the time walk correction 
      The correction function is made by 2 straight lines 
   */
-  FILE *fIn;
-
+  std::ifstream fIn;
+  std::stringstream ss;
+  char aux[500];
+  TString line;
+  int sector=-1, pmt=-1, anode=-1;
 
   /* Reading the corrections */
-  TString filename = Form("richTimeWalks_ccdb_%d.out",RunNumber);
-  std::cout <<"correction file: "<< filename << std::endl;
-  fIn = fopen(filename.Data(), "r");
-  if (fIn) {
-    printf("Reading time walk correction\n");
-    int sector, pmt, anode;
+  if (filename == "")
+    filename = Form("richTimeWalks_ccdb_%d.out",RunNumber);
 
-    for (int p=0; p<nPMTS; p++) {
-      fscanf(fIn, "%d %d %d", &sector, &pmt, &anode);
-      for (int j=0; j<nTimeWalkPar; j++) {
-	fscanf(fIn, "%lf", &TimeWalkParameter[p][j]);
-      }
-      //printf("p=%d  p[0]=%f  p[1]=%f  p[2]=%f  p[3]=%f  \n", p+1, TimeWalkParameter[p][0], TimeWalkParameter[p][1], TimeWalkParameter[p][2], TimeWalkParameter[p][3]);
-      
+  std::cout <<"correction file: "<< filename << std::endl;
+  fIn.open(filename.Data());
+  if (!fIn.is_open()){
+    printf("ERROR: Cannot read time walk correction, set to 0\n");
+    exit(1);
+  }
+
+  printf("Reading time walk correction\n");
+  while (fIn.good()) {
+    fIn.getline(aux,500);
+    line = aux;
+    if (!(line[0]=='#'|| line.Length()==0)) break;
+  }
+  for (int p=0; p<nPMTS; p++) {
+    line = aux;
+    ss<<line;
+    ss>>sector>>pmt>>anode;
+    for (int j=0; j<nTimeWalkPar; j++) {
+      ss>>TimeWalkParameter[p][j];
     }
-    fclose(fIn);
-  }
-  else {
-    printf("WARNING: Cannot read time walk correction, set to 0\n");
-  }
+    ss.clear();
+    fIn.getline(aux,500);
+  }  
+    //printf("p=%d  p[0]=%f  p[1]=%f  p[2]=%f  p[3]=%f  \n", p+1, TimeWalkParameter[p][0], TimeWalkParameter[p][1], TimeWalkParameter[p][2], TimeWalkParameter[p][3]);
+  fIn.close();
   
   return;
 }

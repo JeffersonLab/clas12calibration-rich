@@ -2,6 +2,7 @@
 /* For time correction */
 extern int iTimeCorr;
 extern int iCalibratedTime;
+extern int iTimeCorrFast;
 
 /* For RICH event solution */
 extern int iRayTracing;
@@ -33,6 +34,9 @@ extern TString inputFiles[MAXFILES];
 /* Name of the application called*/
 extern TString processName;
 
+/*timewalk parameters file*/
+extern TString timewalk_file;
+
 inline void print_help()
 {
   std::cout<<"####### Help #########\n"
@@ -40,8 +44,9 @@ inline void print_help()
     "  Options:\n"
     "\t[-n | --max-events] <n>              : Set max number of entries to be processed to <n>. Default all\n"
     "\t[-R | --run-number] <R>              : Set run number to <R>. Default 0\n"
-    "\t[-T | --time-correction-type] <T>    : Set Time correction type: 0=No corr; 1=Only offset; 2=offset and time-walk; 3=Only time-walk. Default 0. Overwriten by option -C\n"
+    "\t[-T | --time-correction-type] <T>    : Set the time correction type to be loaded: 0=No corr; 1=Only time offset; 2=time offset and time-walk; 3=only timewalk. Default 0. Overwriten by option -C\n"
     "\t[-C | --use-rich-calib-time]         : Use RICH calibrated time. The option -T is forced to 0.\n"
+    "\t[-W | --timewalk-file] <file>        : use timewalk parameters in <file>. Option -C will be neglected.\n"
     "\t[-s | --add-event-start-time]        : Add event start time to photons start time. This should already been done in RICH recconstruction process.\n"
     "\t[-r | --use-ray-traced]              : Use ray tracing solution instead of Analytic solution.\n"
     "\t[-P | --use-pid] <pid>               : Use event builder pid <pid>. Default 11 (electrons). Not event builder pid values: -1->AllNeg; +1->AllPos; 0->All; 99->Straight tracks\n"
@@ -64,6 +69,7 @@ inline int parse_opt(int argc, char* argv[])
     {"run-number",              required_argument, 0, 'R'},
     {"time-correction",         required_argument, 0, 'T'},
     {"use-rich-calib-time",     no_argument, 0,       'C'},
+    {"timewalk-file",           required_argument, 0, 'W'},
     {"add-event-start-time",    no_argument, 0,       's'},
     {"use-ray-traced",          no_argument, 0,       'r'},
     {"use-pid",                 required_argument, 0, 'P'},
@@ -74,7 +80,7 @@ inline int parse_opt(int argc, char* argv[])
   
   if(argc==1)
     print_help();
-  while ( (c = getopt_long(argc, argv, "n:hR:T:CsrP:t:Z", long_options, &option_index))  != -1)
+  while ( (c = getopt_long(argc, argv, "n:hR:T:CsrP:W:t:Z", long_options, &option_index))  != -1)
     switch (c){
     case 'h':
       print_help();
@@ -108,6 +114,11 @@ inline int parse_opt(int argc, char* argv[])
     case 'C':
       iCalibratedTime = 1;
       printf("Using RICH calibrated time (time correction flag forced to 0)\n");
+      break;
+
+    case 'W':
+      timewalk_file = optarg;
+      printf("timewalk parameters file to be used: %s.\n",optarg);
       break;
       
     case 't':

@@ -18,6 +18,7 @@
 #include <TRint.h>
 #include <TStyle.h>
 #include <TBenchmark.h>
+#include <sstream> 
 
 /****************************************/
 /* CLAS12 Bank definition */
@@ -67,6 +68,9 @@ TString inputFiles[MAXFILES];
 /* output root file */
 TString rootFile = "";
 
+/*timewalk parameters file.*/
+TString timewalk_file = "";
+
 /* ================================================================ */
 #include <RichHW.h>
 #include "Clas12Detectors.h"
@@ -91,6 +95,10 @@ int main(int argc, char* argv[]) {
     std::cout<<"Please give the run number\n";
     return -1;
   }
+
+  if (timewalk_file != "") {
+    iCalibratedTime = 0;
+  }
   
   rootFile =  Form("RichTimeCalibE_%d",RunNumber);
   std::cout<<"Root file name: " + rootFile<<std::endl;
@@ -108,12 +116,13 @@ int main(int argc, char* argv[]) {
   /* Enforcing no time correction if the RICH calibrated time is used */
   if (iCalibratedTime) iTimeCorr = 0;
 
-
   /* ===================================== */
   /* Time corrections */
   InitTimeCorrections();
-  if ( (iTimeCorr == 1) || (iTimeCorr == 2) ) LoadTimeOffsets();
-  if ( (iTimeCorr == 2) || (iTimeCorr == 3) ) LoadTimeWalkPars();
+  if ( (iTimeCorr == 1) || (iTimeCorr == 2)) LoadTimeOffsets();
+  if (( (iTimeCorr == 2) || (iTimeCorr == 3) )) LoadTimeWalkPars(timewalk_file);
+
+  if (timewalk_file!="") LoadTimeWalkPars(timewalk_file); 
 
   /* ===================================== */
   /* Some counters */
@@ -125,13 +134,11 @@ int main(int argc, char* argv[]) {
   int nRich = 0;
   int nphotons = 0;
 
-
   //  int tile
   int  pmt, anode, absChannel;
   //  TH1F *h1;
   TH2F *h2;
   char name[200];
- 
 
   /* ====================================== */
   /* LOOP OVER THE HIPO FILES */
@@ -160,7 +167,6 @@ int main(int argc, char* argv[]) {
       fReader->read(*fEvent);
        /* looking for CLAS12 banks */
       if (FillBanks() ) {
-
 
 	/* looking for good triggers */
 	if (RUN__config->getRows()) {
@@ -252,7 +258,7 @@ int main(int argc, char* argv[]) {
 
 		    /* Corrected delta T */
 		    double DTimeCorr = DTime;
-		    if (iTimeCorr) {
+		    if (iTimeCorr || timewalk_file != 0) {
 		      /* Corrected measured time */
 		      double MeasPhotonTimeCorr = GetCorrectedTime(pmt, anode, MeasPhotonTime, duration);
 		      DTimeCorr = MeasPhotonTimeCorr - CalcPhotonTime;

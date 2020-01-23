@@ -5,7 +5,7 @@
 # including the time walk parameters. Is part of the calibration suite that 
 # must be run at the beginning of each data taking.
 # Usage:
-# > ./run_richTimimg.sh <phase> <outdir> [RN]
+# > ./run_richTimimg.sh <phase> <outdir> [RN] [-tw <twfile>]
 # <phase>  = The phase in which the program will run 
 #          (0: make hist for time offset, 1: make hist for time walk).
 # <outdir> = output directory
@@ -31,13 +31,19 @@ echo "RUN NUMBER "$RN
 phase=$1
 outdir=$2
 
+TWFILE=""
+twopt=""
+if [ $5 == "-tw" ]; then
+    TWFILE=$6
+    twopt=" -W "$TWFILE
+fi
+
 ldd ./richTiming
 printenv
 ## Running the application
-./richTiming -R $RN -r -P 0 -T $phase *.hipo
+./richTiming -R $RN -r -P 0 -T $phase *.hipo $twopt
 ls
 ofile="`ls *.root`"
 
 ## Setting the output file transfer
 swif outfile $ofile file:$outdir/${outpref}__${ofile}
-

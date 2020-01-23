@@ -50,7 +50,7 @@ def checkdir(path):
 
 def get_file_list(path,regexp="*.hipo"):
     flist=glob.glob(path + "/" + regexp)
-    return flist
+    return sorted(flist)
 
 ###### import file list from file ############
 def import_flist(fname):
@@ -90,8 +90,9 @@ def add_hist_job(wf,fnl,phase=0,c=0):
     outdir = outdir_pref + "/T" + str(T)
     checkdir(outdir)
 
-    outpref = fnl[0]
-    outpref = outpref.split("/")[-1].replace(".hipo","-bunch")
+    firstf = fnl[0].split('/')[-1].replace(".hipo","")
+    lastf  = fnl[-1].split('/')[-1].replace(".hipo","")
+    outpref = firstf + "_" + lastf.split(".")[-1]
 
     cmd += " ./" + script.split("/")[-1] + " " + str(T) +  " " + outdir + " " + outpref + " " + RN
     if DEBUG : print (cmd)
@@ -130,9 +131,11 @@ def add_ana_job(wf,flist,phase=0):
 
     c = 0
     for fnl in flist:
-        fname = fnl[0]
-        fname = fname.split("/")[-1]
-        fname = outdir_pref + "/T"+ str(T) +"/" + fname.replace(".hipo","-bunch") + "__RichTimeCalibE_" + RN + "_" + str(T) +".root"
+        firstf = fnl[0].split('/')[-1].replace(".hipo","")
+        lastf  = fnl[-1].split('/')[-1].replace(".hipo","")
+        fname  = firstf + "_" + lastf.split(".")[-1]
+
+        fname = outdir_pref + "/T"+ str(T) +"/" + fname + "__RichTimeCalibE_" + RN + "_" + str(T) +".root"
         cmd += " -input " + fname.split("/")[-1] + " file:" + fname
         c +=1
         if c>= MAXJOBS and DEBUG: break

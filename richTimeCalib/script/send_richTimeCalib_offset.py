@@ -19,16 +19,19 @@ if RICHTIMECALIB_OUTPATH == "":
 ############## global setting ###########
 outdir_pref = RICHTIMECALIB_OUTPATH
 appHist   = RICHTIMECALIB + "/bin/richTiming"
-aBin = [RICHTIMECALIB + "/bin/richTimeCheck"]
-scriptHist= RICHTIMECALIB + "/script/run_richTimingRecTimeCheck.sh"
-aScript  = [RICHTIMECALIB + "/script/run_TC.sh"]
+aBin = [RICHTIMECALIB + "/bin/richTimeOffsets"]
+aBin.append(RICHTIMECALIB + "/bin/richTimeCheck")
+scriptHist= RICHTIMECALIB + "/script/run_richTiming.sh"
+aScript  = [RICHTIMECALIB + "/script/run_TO_corr.sh"]
+aScript.append(RICHTIMECALIB + "/script/run_TC.sh")
 maps = [RICHTIMECALIB + "/maps/SspRich_mapCHANNEL2PIXEL.txt"]
 maps.append(RICHTIMECALIB + "/maps/SspRich_mapFIBER2PMT_sortbyPMT.txt")
 envscript = RICHTIMECALIB + "/script/setenv.sh"
 ofile_pref = "RichTimeCalib_"
-WF    = "RICH_RecTimeCheck"
+WF    = "RICH_TC_OFFSET"
 RN    = 0
 TRACK = "analysis"
+TWFILE = ""
 BS = 10  # hist jobs bunch size
 ## debug run ##
 DEBUG = False
@@ -46,7 +49,7 @@ def checkdir(path):
 
 def get_file_list(path,regexp="*.hipo"):
     flist=glob.glob(path + "/" + regexp)
-    return flist
+    return sorted(flist)
 
 ###### import file list from file ############
 def import_flist(fname):
@@ -58,7 +61,7 @@ def import_flist(fname):
 
 ##### add histogram job to workflow
 def add_hist_job(wf,fnl,phase=0,c=0):
-    global outdir_pref, appHist, scriptHist, RN, envscript
+    global outdir_pref, appHist, scriptHist, RN, envscript, TWFILE
     script = scriptHist
     jname = wf + "_" + "ph" + str(phase) + "_" + str(c)
     size = 0
@@ -77,16 +80,23 @@ def add_hist_job(wf,fnl,phase=0,c=0):
 
     for fname in fnl:
         cmd += " -input " + fname.split("/")[-1] + " file:" + fname
-    T = int(phase/2)
 
-    outdir = outdir_pref + "/TC"
+    T = phase
+
+    corr_type = "Offsets"
+    if phase > 0:
+        cmd += " -input richTime" + corr_type + "_ccdb_" + RN + ".out" + " file:" + outdir_pref + "/T" + corr_type + "W/richTime" + corr_type + "_ccdb_" + RN + ".out"
+
+    cmd += " -input " + TWFILE.split('/')[-1] + " file:" + TWFILE
+
+    outdir = outdir_pref + "/T" + str(T) + "W" 
     checkdir(outdir)
 
     firstf = fnl[0].split('/')[-1].replace(".hipo","")
     lastf  = fnl[-1].split('/')[-1].replace(".hipo","")
     outpref = firstf + "_" + lastf.split(".")[-1]
 
-    cmd += " ./" + script.split("/")[-1] + " " + outdir + " " + outpref + " " + RN
+    cmd += " ./" + script.split("/")[-1] + " " + str(T) +  " " + outdir + " " + outpref + " " + RN + " -tw " + TWFILE.split('/')[-1]
     if DEBUG : print (cmd)
     subprocess.call(cmd,shell=True)
 
@@ -99,8 +109,11 @@ def add_ana_job(wf,flist,phase=0):
     cmd += " -phase " + str(phase)
     cmd += " -shell /bin/bash" 
 
-    script = aScript[0]
-    app = aBin[0]
+    T = phase-1
+
+    ind=int((phase-1)/2)
+    script = aScript[ind]
+    app = aBin[ind]
 
     cmd += " -input " + app.split("/")[-1] + " file:" + app
     cmd += " -input " + script.split("/")[-1] + " file:" + script
@@ -112,9 +125,9 @@ def add_ana_job(wf,flist,phase=0):
 
     jname = wf + "_" + "ph" + str(phase) 
 
-    corr_type = ["TRecCheck"]
-    outdir = outdir_pref + "/" + corr_type[0]
-    jname += "_" + corr_type[0]
+    corr_type = ["TOffsets","TCheck"]
+    outdir = outdir_pref + "/" + corr_type[ind] + "W"
+    jname += "_" + corr_type[ind]
 
     cmd += " -name " + jname
 
@@ -126,7 +139,7 @@ def add_ana_job(wf,flist,phase=0):
         lastf  = fnl[-1].split('/')[-1].replace(".hipo","")
         fname  = firstf + "_" + lastf.split(".")[-1]
 
-        fname = outdir_pref + "/TC" + "/" + fname + "__RichTimeCalibE_" + RN + "_C.root"
+        fname = outdir_pref + "/T"+ str(T) +"W/" + fname + "__RichTimeCalibE_" + RN + "_" + str(T) +".root"
         cmd += " -input " + fname.split("/")[-1] + " file:" + fname
         c +=1
         if c>= MAXJOBS and DEBUG: break
@@ -166,10 +179,10 @@ def run_wf():
 ######## main routine ####
 
 def main():
-    global WF, RN, outdir_pref, MAXJOBS, BS
-    if len(argv)!=3: 
-        print "A directory with calibration files or filelist must be supplied together with a run number"
-        print argv[0] + " filelist.txt <RN>"
+    global WF, RN, outdir_pref, MAXJOBS, BS, TWFILE
+    if len(argv)!=4: 
+        print "A directory with calibration files or filelist must be supplied together with a run number and a timewalk parameters file"
+        print argv[0] + " filelist.txt <RN> <TWFILE>"
         exit (1)
     if not os.path.exists(argv[1]):
         print "The file or path " + argv[1] + " does not exist"
@@ -180,6 +193,8 @@ def main():
     except ValueError:
         print "The run number must be an integer!. You supplied " + argv[2]
         exit(0)
+    
+    TWFILE = os.path.abspath(argv[3])
 
     if RN == 0:
         RN = "" 
@@ -201,7 +216,17 @@ def main():
     flist = [flist_flat[x*BS:(x+1)*BS] for x in range( -(-len(flist_flat) // BS ) )]
     ##### Setting jobs phase ###########
     phase = 0
-    ##### Putting jobs to make histograms using rec time (hit time) ####
+    ##### Putting jobs to make histograms without correction ####
+    add_hist_job_bunch(flist,phase)
+
+    ##### Setting jobs phase ###########
+    phase +=1
+    #### Putting jobs to make TO corrections with TW parameters in file####
+    add_ana_job(WF,flist,phase)
+
+    ##### Setting jobs phase ###########
+    phase +=1
+    #### Putting jobs to make histogram with TO and TW corrections ####
     add_hist_job_bunch(flist,phase)
 
     ##### Setting jobs phase ###########
