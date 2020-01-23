@@ -179,7 +179,7 @@ def run_wf():
 ######## main routine ####
 
 def main():
-    global WF, RN, outdir_pref, MAXJOBS, BS, TWFILE
+    global WF, RN, outdir_pref, MAXJOBS, BS, TWFILE, RICHTIMECALIB_OUTPATH
     if len(argv)!=4: 
         print "A directory with calibration files or filelist must be supplied together with a run number and a timewalk parameters file"
         print argv[0] + " filelist.txt <RN> <TWFILE>"

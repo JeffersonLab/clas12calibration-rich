@@ -43,12 +43,12 @@ int main(int argc, char *argv[])
   TString fileHist = argv[1];
   int run = atoi(argv[2]);
 
-  bool doCorrectedTime = false;
+  /*  bool doCorrectedTime = false;
   if (argc==4){
     std::cout<<"doing time correction"<<std::endl;
     doCorrectedTime = true;
   }
-
+  */
 
   Char_t fname[100];
   Char_t hname[100];
@@ -105,14 +105,20 @@ int main(int argc, char *argv[])
 
   /********************************************************/
   /* Getting the Histogram */
-  sprintf(hname,"hDTime"); 
-  if (doCorrectedTime) sprintf(hname,"hDTimeCorr"); 
+  sprintf(hname,"hDTimeCorr");  
   TH2F *hDTime = (TH2F*)fHist->Get(hname);
   if (!hDTime) {
-    printf("ERROR: Cannot find histogram \n");
+    printf("ERROR: Cannot find histogram: %s \n",hname);
     return 1;
   }
-
+  if (hDTime->GetMaximum()<100){
+    if (!hDTime) {
+      printf("ERROR: Cannot find histogram: %s\n",hname);
+      return 1;
+    }
+    sprintf(hname,"hDTime"); 
+    hDTime = (TH2F*)fHist->Get(hname);
+  }
 
   /******************************************/
   /* some summary histograms */

@@ -22,6 +22,7 @@ Once you run the programs a folder for each run number will be created under the
 
 
 ## Use
+### Mode 1: Full Calibration, estimate time-offsets and time-walks.
 ```
 cd $RICHTIMECALIB/script
 ./send_richTimeCalib.py <path-to-calib-files or list-of-calib-files> <run-number>
@@ -45,7 +46,44 @@ $RICHTIMECALIB_OUTPATH/<run-number>`
     └── ...
 ```
 
-## Structure
+### Mode 2: Partial Calibration, estimate time-offsets given time-walks.
+```
+cd $RICHTIMECALIB/script
+./send_richTimeCalib_offset.py <path-to-calib-files or list-of-calib-files> <run-number> <timewalk-file>
+```
+After finishing you will have a folder in ```$RICHTIMECALIB_OUTPATH``` named ```<run-number>```
+
+The structure inside ```$RICHTIMECALIB_OUTPATH/<run-number>``` is:
+```
+$RICHTIMECALIB_OUTPATH/<run-number>`
+├── T0W       # Histograms with time walk corrections
+│   ├── ...
+├── T2W       # Histograms with time walk and time offset correction
+│   ├── ...
+├── TCheckW   # Summary histograms and diagnose information
+│   ├── ...
+├── TOffsetsW # Time offset correction histograms and calibration parameters
+    └── ...
+```
+
+### Mode 3: Perform the reconstruction time check, use calibrated time from reconstruction.
+```
+cd $RICHTIMECALIB/script
+./send_richRecTimeCheck.py <path-to-calib-files or list-of-calib-files> <run-number>
+```
+After finishing you will have a folder in ```$RICHTIMECALIB_OUTPATH``` named ```<run-number>```
+
+The structure inside ```$RICHTIMECALIB_OUTPATH/<run-number>``` is:
+```
+$RICHTIMECALIB_OUTPATH/<run-number>`
+├── TC        # Histograms with time corrections from reconstruction.
+│   ├── ...
+├── TRecCheck # Summary histograms and diagnose information
+    └── ...
+```
+
+
+## Package Structure
 The package structure is organize in the folowing way:
 ```
 $RICHTIMECALIB
