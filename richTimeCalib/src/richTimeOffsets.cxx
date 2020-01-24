@@ -111,14 +111,17 @@ int main(int argc, char *argv[])
     printf("ERROR: Cannot find histogram: %s \n",hname);
     return 1;
   }
-  if (hDTime->GetMaximum()<100){
+  
+  if (hDTime->GetMaximum()<10){
+    sprintf(hname,"hDTime"); 
+    hDTime = (TH2F*)fHist->Get(hname);
     if (!hDTime) {
       printf("ERROR: Cannot find histogram: %s\n",hname);
       return 1;
     }
-    sprintf(hname,"hDTime"); 
-    hDTime = (TH2F*)fHist->Get(hname);
+
   }
+
 
   /******************************************/
   /* some summary histograms */
@@ -305,7 +308,6 @@ int main(int argc, char *argv[])
     }
   }
 
-
   c2->cd();
   gStyle->SetOptStat(1111);
   
@@ -315,8 +317,6 @@ int main(int argc, char *argv[])
   //Hlist.ls();
   Hlist.Write();
   f.Close();
- 
-
   
   /******************************************/
   c1->Print(Form("%s]", fname));
