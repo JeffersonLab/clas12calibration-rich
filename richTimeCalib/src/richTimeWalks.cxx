@@ -136,7 +136,7 @@ int main (int argc, char *argv[])
   /* text output: time walk fit parameters */ 
   sprintf(fname, "richTimeWalks_%d.out", run);
   FILE *fOut = fopen(&fname[0], "w");
-  sprintf(fname, "richTimeWalks_ccdb_%d.out", run);
+  sprintf(fname, "richTimeWalks_ccdb_%d.txt", run);
   FILE *fOut2 = fopen(&fname[0], "w");
 
   /*******************************************************/

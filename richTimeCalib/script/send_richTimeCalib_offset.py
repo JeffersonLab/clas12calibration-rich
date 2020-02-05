@@ -85,7 +85,7 @@ def add_hist_job(wf,fnl,phase=0,c=0):
 
     corr_type = "Offsets"
     if phase > 0:
-        cmd += " -input richTime" + corr_type + "_ccdb_" + RN + ".out" + " file:" + outdir_pref + "/T" + corr_type + "W/richTime" + corr_type + "_ccdb_" + RN + ".out"
+        cmd += " -input richTime" + corr_type + "_ccdb_" + RN + ".out" + " file:" + outdir_pref + "/T" + corr_type + "W/richTime" + corr_type + "_ccdb_" + RN + ".txt"
 
     cmd += " -input " + TWFILE.split('/')[-1] + " file:" + TWFILE
 

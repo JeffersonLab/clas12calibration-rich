@@ -28,7 +28,7 @@ void LoadTimeOffsets(TString filename)
 
   /* Reading the corrections */
   if (filename=="")
-    filename   = Form("richTimeOffsets_ccdb_%d.out",RunNumber);
+    filename   = Form("richTimeOffsets_ccdb_%d.txt",RunNumber);
   std::cout <<"correction file: "<< filename << std::endl;
   fIn.open(filename.Data());
   if (!fIn.is_open()){
@@ -71,7 +71,7 @@ void LoadTimeWalkPars(TString filename)
 
   /* Reading the corrections */
   if (filename == "")
-    filename = Form("richTimeWalks_ccdb_%d.out",RunNumber);
+    filename = Form("richTimeWalks_ccdb_%d.txt",RunNumber);
 
   std::cout <<"correction file: "<< filename << std::endl;
   fIn.open(filename.Data());

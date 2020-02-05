@@ -71,6 +71,9 @@ TString rootFile = "";
 /*timewalk parameters file.*/
 TString timewalk_file = "";
 
+/*timeoffset parameters file.*/
+TString timeoffset_file = "";
+
 /* ================================================================ */
 #include <RichHW.h>
 #include "Clas12Detectors.h"
@@ -96,7 +99,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  if (timewalk_file != "") {
+  if (timewalk_file != "" || timeoffset_file != "") {
     iCalibratedTime = 0;
   }
   
@@ -119,7 +122,7 @@ int main(int argc, char* argv[]) {
   /* ===================================== */
   /* Time corrections */
   InitTimeCorrections();
-  if ( (iTimeCorr == 1) || (iTimeCorr == 2)) LoadTimeOffsets();
+  if ( (iTimeCorr == 1) || (iTimeCorr == 2)) LoadTimeOffsets(timeoffset_file);
   if (( (iTimeCorr == 2) || (iTimeCorr == 3) )) LoadTimeWalkPars(timewalk_file);
 
   if (timewalk_file!="") LoadTimeWalkPars(timewalk_file); 

@@ -37,6 +37,9 @@ extern TString processName;
 /*timewalk parameters file*/
 extern TString timewalk_file;
 
+/*timeoffset parameters file*/
+extern TString timeoffset_file;
+
 inline void print_help()
 {
   std::cout<<"####### Help #########\n"
@@ -47,6 +50,7 @@ inline void print_help()
     "\t[-T | --time-correction-type] <T>    : Set the time correction type to be loaded: 0=No corr; 1=Only time offset; 2=time offset and time-walk; 3=only timewalk. Default 0. Overwriten by option -C\n"
     "\t[-C | --use-rich-calib-time]         : Use RICH calibrated time. The option -T is forced to 0.\n"
     "\t[-W | --timewalk-file] <file>        : use timewalk parameters in <file>. Option -C will be neglected.\n"
+    "\t[-O | --timeoffset-file] <file>      : use timeoffset parameters in <file>. Option -C will be neglected.\n"
     "\t[-s | --add-event-start-time]        : Add event start time to photons start time. This should already been done in RICH recconstruction process.\n"
     "\t[-r | --use-ray-traced]              : Use ray tracing solution instead of Analytic solution.\n"
     "\t[-P | --use-pid] <pid>               : Use event builder pid <pid>. Default 11 (electrons). Not event builder pid values: -1->AllNeg; +1->AllPos; 0->All; 99->Straight tracks\n"
@@ -70,6 +74,7 @@ inline int parse_opt(int argc, char* argv[])
     {"time-correction",         required_argument, 0, 'T'},
     {"use-rich-calib-time",     no_argument, 0,       'C'},
     {"timewalk-file",           required_argument, 0, 'W'},
+    {"timeoffset-file",         required_argument, 0, 'O'},
     {"add-event-start-time",    no_argument, 0,       's'},
     {"use-ray-traced",          no_argument, 0,       'r'},
     {"use-pid",                 required_argument, 0, 'P'},
@@ -80,7 +85,7 @@ inline int parse_opt(int argc, char* argv[])
   
   if(argc==1)
     print_help();
-  while ( (c = getopt_long(argc, argv, "n:hR:T:CsrP:W:t:Z", long_options, &option_index))  != -1)
+  while ( (c = getopt_long(argc, argv, "n:hR:T:CsrP:W:O:t:Z", long_options, &option_index))  != -1)
     switch (c){
     case 'h':
       print_help();
@@ -119,6 +124,11 @@ inline int parse_opt(int argc, char* argv[])
     case 'W':
       timewalk_file = optarg;
       printf("timewalk parameters file to be used: %s.\n",optarg);
+      break;
+
+    case 'O':
+      timeoffset_file = optarg;
+      printf("timeoffset parameters file to be used: %s.\n",optarg);
       break;
       
     case 't':

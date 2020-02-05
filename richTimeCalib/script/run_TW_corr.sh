@@ -13,6 +13,10 @@
 source setenv.sh
 
 outdir=$1
+echo "### output ps ###"
+ps
+echo "### output ls ###"
+ls
 
 RFNAME="`ls *.root | head -1`"
 RFNAME=${RFNAME/*__/} 
@@ -27,12 +31,12 @@ if [ -z $2 ]; then
 else
     RN=$2
 fi
-ls
 
 rhadd=`root-config --bindir`/hadd
 $rhadd $RFNAME *__*.root
 
 ./richTimeWalks $RFNAME $RN
+echo "### output ls ###"
 ls
 
 ## Setting the output file transfer
@@ -48,5 +52,5 @@ swif outfile $ofile file:$outdir/${ofile}
 ofile="`ls richTimeWalks_${RN}.out`"
 swif outfile $ofile file:$outdir/${ofile}
 
-ofile="`ls richTimeWalks_ccdb_${RN}.out`"
+ofile="`ls richTimeWalks_ccdb_${RN}.txt`"
 swif outfile $ofile file:$outdir/${ofile}

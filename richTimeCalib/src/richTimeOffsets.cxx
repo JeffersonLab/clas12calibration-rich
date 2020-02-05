@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   /******************************************************/
   /* text file with time offsets */
   FILE *fOut = fopen(Form("richTimeOffsets_%d.out", run), "w");
-  FILE *fOut2 = fopen(Form("richTimeOffsets_ccdb_%d.out", run), "w");
+  FILE *fOut2 = fopen(Form("richTimeOffsets_ccdb_%d.txt", run), "w");
 
   /********************************************************/
   /* Getting the Histogram */

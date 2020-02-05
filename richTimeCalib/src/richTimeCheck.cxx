@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   /* text output with problematic channels */ 
   sprintf(fname, "richTimeCheck_%d.out", run);
   FILE *fOut = fopen(&fname[0], "w");
-  sprintf(fname, "richTimeCheck_ccdb_%d.out", run);
+  sprintf(fname, "richTimeCheck_ccdb_%d.txt", run);
   FILE *fOut2 = fopen(&fname[0], "w");
 
 

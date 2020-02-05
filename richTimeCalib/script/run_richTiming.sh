@@ -27,21 +27,31 @@ else
 fi
 outpref=$3
 
+echo "### output ps ###"
+ps
+echo "### output ls ###"
+ls
+
 echo "RUN NUMBER "$RN
 phase=$1
 outdir=$2
 
-TWFILE=""
-twopt=""
+TFILE=""
+topt=""
 if [ $5 == "-tw" ]; then
-    TWFILE=$6
-    twopt=" -W "$TWFILE
+    TFILE=$6
+    topt=" -W "$TFILE
+elif [ $5 == "-to" ]; then
+    TFILE=$6
+    topt=" -O "$TFILE
 fi
 
 ldd ./richTiming
 printenv
 ## Running the application
-./richTiming -R $RN -r -P 0 -T $phase *.hipo $twopt
+./richTiming -R $RN -r -P 0 -T $phase *.hipo $topt
+
+echo "### output ls ###"
 ls
 ofile="`ls *.root`"
 
