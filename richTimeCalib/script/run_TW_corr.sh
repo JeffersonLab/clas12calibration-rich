@@ -5,7 +5,7 @@
 # including the time walk parameters. Is part of the calibration suite that 
 # must be run at the beginning of each data taking.
 # Usage:
-# > ./run_TO_corr.sh <outdir> [RN]
+# > ./run_TW_corr.sh <outdir> [RN]
 # <outdir> = output directory
 # [RN]     = Optional parameter, run number.
 #

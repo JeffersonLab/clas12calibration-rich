@@ -82,6 +82,21 @@ $RICHTIMECALIB_OUTPATH/<run-number>`
     └── ...
 ```
 
+### Mode 4: Check specific corrections given time-offsets and time-walks.
+```
+cd $RICHTIMECALIB/script
+./send_richTimeCalib_offset_walks.py <path-to-calib-files or list-of-calib-files> <run-number> <timeoffset-file> <timewalk-file>
+```
+After finishing you will have a folder in ```$RICHTIMECALIB_OUTPATH``` named ```<run-number>```
+
+The structure inside ```$RICHTIMECALIB_OUTPATH/<run-number>``` is:
+```
+$RICHTIMECALIB_OUTPATH/<run-number>`
+├── T2OW      # Histograms with time walk and time offset correction
+│   ├── ...
+├── TCheckOW  # Summary histograms and diagnose information
+    └── ...
+```
 
 ## Package Structure
 The package structure is organize in the folowing way:
