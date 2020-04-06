@@ -10,12 +10,12 @@ This package contains a set of tools to extract time calibration parameters for 
 git clone https://github.com/JeffersonLab/clas12calibration-rich
 cd clas12calibration-rich/richTimeCalib
 
-# use the script depending on your system, setenv.csh or setenv.sh
-source script/setenv.csh 
+# use the script depending on your system: setenv.csh (setenv.sh)
+source script/setenv.csh   (source script/setenv.sh)
 make
 make install
-setenv RICHTIMECALIB `pwd`
-setenv RICHTIMECALIB_OUTPATH <output-path>
+setenv RICHTIMECALIB `pwd`  # (export RICHTIMECALIB=`pwd`)
+setenv RICHTIMECALIB_OUTPATH <output-path>   (export RICHTIMECALIB_OUTPATH=<output-path>)
 ```
 add the enviroments variables ```RICHTIMECALIB``` and ```RICHTIMECALIB_OUTPATH``` to your login script.
 Once you run the programs a folder for each run number will be created under the path ```RICHTIMECALIB_OUTPATH```
