@@ -85,7 +85,7 @@ def add_hist_job(wf,fnl,phase=0,c=0):
     corr_type = ["Offsets","Walks"]
     if T > 0:
         for k in range(T,0,-1):
-            cmd += " -input richTime" + corr_type[k-1] + "_ccdb_" + RN + ".out" + " file:" + outdir_pref + "/T" + corr_type[k-1] + "/richTime" + corr_type[k-1] + "_ccdb_" + RN + ".txt"
+            cmd += " -input richTime" + corr_type[k-1] + "_ccdb_" + RN + ".txt" + " file:" + outdir_pref + "/T" + corr_type[k-1] + "/richTime" + corr_type[k-1] + "_ccdb_" + RN + ".txt"
 
     outdir = outdir_pref + "/T" + str(T)
     checkdir(outdir)

@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
   Char_t hname2[100];
   //  Char_t title[100];
 
+  gErrorIgnoreLevel = kWarning;
+
 
   /* limits to select problematic channels */
   double SigmaLimit = DTnsigma * DTsigma;

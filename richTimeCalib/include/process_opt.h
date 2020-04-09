@@ -10,15 +10,6 @@ extern int iRayTracing;
 /* Particle ID*/
 extern int RichParticleID;
 
-/* For the event start time correction */
-extern int iSTtimeCorr;
-
-/* Average DTime range for histograms */
-extern double HistoAveDT;
-
-/* Flag for Zero Filed run analysis */
-extern int IsZeroField;
-
 /* number of input files */
 extern int nFiles;
 
@@ -51,11 +42,8 @@ inline void print_help()
     "\t[-C | --use-rich-calib-time]         : Use RICH calibrated time. The option -T is forced to 0.\n"
     "\t[-W | --timewalk-file] <file>        : use timewalk parameters in <file>. Option -C will be neglected.\n"
     "\t[-O | --timeoffset-file] <file>      : use timeoffset parameters in <file>. Option -C will be neglected.\n"
-    "\t[-s | --add-event-start-time]        : Add event start time to photons start time. This should already been done in RICH recconstruction process.\n"
     "\t[-r | --use-ray-traced]              : Use ray tracing solution instead of Analytic solution.\n"
-    "\t[-P | --use-pid] <pid>               : Use event builder pid <pid>. Default 11 (electrons). Not event builder pid values: -1->AllNeg; +1->AllPos; 0->All; 99->Straight tracks\n"
-    "\t[-t | --set-avg-DTime-window] <t>    : Set the average of the DTime window in the histograms to <t> ns. Default: -90.\n"
-    "\t[-Z | --analyse-zero-filed-data]     : Analysis of Zero Field data\n"
+    "\t[-P | --use-pid] <pid>               : Use event builder pid <pid>. Default 11 (electrons). Not event builder pid values: -1->AllNeg; +1->AllPos; 0->All;\n"
     "\t[-h | --help]                        : Print this help.\n"
     "#########################"	   <<std::endl;
   exit(0);
@@ -75,11 +63,8 @@ inline int parse_opt(int argc, char* argv[])
     {"use-rich-calib-time",     no_argument, 0,       'C'},
     {"timewalk-file",           required_argument, 0, 'W'},
     {"timeoffset-file",         required_argument, 0, 'O'},
-    {"add-event-start-time",    no_argument, 0,       's'},
     {"use-ray-traced",          no_argument, 0,       'r'},
     {"use-pid",                 required_argument, 0, 'P'},
-    {"set-avg-DTime-window",    required_argument, 0, 't'},
-    {"analyse-zero-filed-data", no_argument, 0,       'Z'},
     {0, 0, 0, 0}
   };
   
@@ -106,11 +91,6 @@ inline int parse_opt(int argc, char* argv[])
       printf("Using Ray Tracing solution\n");
       break;
       
-    case 's':
-      iSTtimeCorr = 1;
-      printf("Correcting the event start time by hand\n");
-      break;
-      
     case 'T':
       iTimeCorr = atoi(optarg);
       printf("Applying time correction with flag %d\n", iTimeCorr);
@@ -131,21 +111,11 @@ inline int parse_opt(int argc, char* argv[])
       printf("timeoffset parameters file to be used: %s.\n",optarg);
       break;
       
-    case 't':
-      HistoAveDT = atof(optarg);
-      printf("DTime histogram average: %lf\n", HistoAveDT);
-      break;
-      
     case 'P':
       RichParticleID = atoi(optarg);
       printf("Using particles with PID %d\n", RichParticleID);
       break;
       
-    case 'Z':
-      IsZeroField = 1;
-      printf("Analysis of Zero Field data\n");
-      break;
-
     case '?':
       if (isprint (optopt))
 	fprintf (stderr, "Unknown option `-%c'.\n", optopt);

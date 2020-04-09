@@ -44,15 +44,6 @@ int iRayTracing = 0;
 /* Particle ID*/
 int RichParticleID = 11;
 
-/* For the event start time correction */
-int iSTtimeCorr = 0;
-
-/* Average DTime range for histograms */
-double HistoAveDT = 0;
-
-/* Flag for Zero Filed run analysis */
-int IsZeroField = 0;
-
 /* number of input files */
 int nFiles = 0;
 
@@ -77,8 +68,20 @@ TString timeoffset_file = "";
 /* ================================================================ */
 #include <RichHW.h>
 #include "Clas12Detectors.h"
-#include "Clas12Pid.h"
 #include <RichTimeCorr.h>
+
+
+/* ================================================================ */
+int GoodRichParticle(int richhadron_index);
+int GoodParticleID(int ipart, int pid);
+int GoodRichPhoton(int photon_index);
+
+double PminElectron = 1.5;
+double PminPion = 1.5;
+
+/* speed of ligth cm/ns */
+#define vLight 29.979
+
 
 /* ================================================================ */
 /* Histograms */
@@ -190,15 +193,9 @@ int main(int argc, char* argv[]) {
 	    /* Selecting events with 1 track in the RICH */
 	    if (RICH__hadrons->getRows() == 1) {
 	      int richhadron_index = 0;
-
+	    
 	      /* Selecting the good particle in the RICH */
-	      int RichParticleQ = 0;
-	      if (IsZeroField == 0) {
-		RichParticleQ = GoodRichParticle(richhadron_index);
-	      }
-	      else if (IsZeroField == 1) {
-		RichParticleQ = GoodRichParticle_ZeroField(richhadron_index);
-	      }
+	      int RichParticleQ = GoodRichParticle(richhadron_index);
 	      if (RichParticleQ > 0) {
 		nRichTracks++;
 	      
@@ -210,13 +207,8 @@ int main(int argc, char* argv[]) {
 		  int richhit_pindex = RICH__photons_hit_index;
 		  //int richhadron_pindex = RICH__photons_hadron_index;
 
-		  /* good ray tracing photon, if selected */
-		  int GoodPhoton = 1;
-		  if (iRayTracing) {
-		    if ( (RICH__photons_traced_the == 0) || (RICH__photons_traced_phi == 0) || (RICH__photons_traced_EtaC == 0) ) GoodPhoton = 0; 
-		  }
-
-		  if ( (RICH__photons_type == 0) && GoodPhoton) {
+		  /* Good RICH photon, reconstruction is ok */
+		  if ( GoodRichPhoton(f) ) {
 		    nphotons++;
 
 		    /* channel info */
@@ -238,14 +230,10 @@ int main(int argc, char* argv[]) {
 
 		    /* Calculated photon time with respect to the event start time */
 		    double PhotonStartTime = RICH__photons_start_time;
-		    if (iSTtimeCorr) PhotonStartTime = RICH__photons_start_time + REC__Event_startTime;
 		    double CalcPhotonTime = PhotonStartTime + PhotonPathTime;
-	 	
+
 		    /* Delta T (measured-calculated) */
 		    double DTime = MeasPhotonTime - CalcPhotonTime;
-		
-		    //printf("i=%d  rawT=%f  rawTc=%f  ts=%f\n", RICH__hits_rawtime, MeasPhotonTime, ts);
-		    //printf("  stT=%f   anT=%f  DT=%f\n", RICH__photons_start_time, RICH__photons_analytic_time, DTime);
 		
 		    sprintf(name, "hDTime");
 		    gDirectory->GetObject(name, h2);
@@ -261,16 +249,19 @@ int main(int argc, char* argv[]) {
 
 		    /* Corrected delta T */
 		    double DTimeCorr = DTime;
-		    if (iTimeCorr || timewalk_file != 0) {
-		      /* Corrected measured time */
-		      double MeasPhotonTimeCorr = GetCorrectedTime(pmt, anode, MeasPhotonTime, duration);
-		      DTimeCorr = MeasPhotonTimeCorr - CalcPhotonTime;
-		    }
 
 		    /* use calibrated measured time */
 		    if (iCalibratedTime){
 		      double MeasPhotonTimeCorr = RICH__hits_time;
 		      DTimeCorr = MeasPhotonTimeCorr - CalcPhotonTime;
+		    }
+		    else {
+		      /* Reapplying the correction */
+		      if (iTimeCorr || timewalk_file != "") {
+			/* Corrected measured time */
+			double MeasPhotonTimeCorr = GetCorrectedTime(pmt, anode, MeasPhotonTime, duration);
+			DTimeCorr = MeasPhotonTimeCorr - CalcPhotonTime;
+		      }
 		    }
 
 		    sprintf(name, "hDTimeCorr");
@@ -284,13 +275,13 @@ int main(int argc, char* argv[]) {
 		    sprintf(name, "hDTimeCorrVsDuration_Pmt%d", pmt);
 		    gDirectory->GetObject(name, h2);
 		    h2->Fill(duration, DTimeCorr);
-		
-		    
-		  }/* END of good photon type */
+
+		  }/* END good RICH photon */
 
 
 		}/* END loop over RICH photons */
-		  
+
+		
 		if (nphotons) nRich++;
 	      }/* Good RICH particle */
 	      else {
@@ -298,10 +289,9 @@ int main(int argc, char* argv[]) {
 		  nRichBadClusters++;
 		}
 	      }
-	    
+
 
 	    }/* END events with one track in the RICH */
-	    
 
 	  }
 
@@ -351,24 +341,17 @@ void makeHistos()
   double bmin = 0.5;
   double bmax = nbins + 0.5;
 
-  /* DeltaT binning */
-  int na = 200;
-  double amin = -120;
-  double amax = -20;
-  amin = HistoAveDT - 50;
-  amax = HistoAveDT + 50;
-
   /* ====================================== */
   /* larger time window to accomodate all the possible timing variations */
-  na = 1000;
-  amin = -700.;
-  amax = 300;
+  int na = 1000;
+  double amin = -700.;
+  double amax = 300;
   /* ======== */
   
 
   /* DeltaTcorr binning */
-  int ndt = 400;
-  double dt1 = -50;
+  int ndt = 500;
+  double dt1 = -150;
   double dt2 = 50;
 
   /* duration binning */
@@ -414,4 +397,75 @@ void makeHistos()
 
   }
  
+}
+/* --------------------------------------------- */
+int GoodRichParticle(int richhadron_index)
+{
+  /* Selecting good particles for RICH timing */
+
+  
+  get_RICH__hadrons(richhadron_index);
+  int recparticle_pindex = RICH__hadrons_particle_index;
+  get_REC__Particle(recparticle_pindex);
+  int recparticle_pid = REC__Particle_pid;
+
+  /* good particle ID */
+  if ( (recparticle_pid == RichParticleID) ||  //specific ID
+       (RichParticleID == 0) ||  //All particles
+       (RichParticleID == 1) ||  // All positive particles
+       (RichParticleID == -1)||  // All negative particles
+       (RichParticleID == 99) )  // Straight tracks with zero field
+    {
+
+      /* Checking quality of the PID */
+      if (GoodParticleID(recparticle_pindex, RichParticleID)) return 1;
+      else return 0;
+
+    }
+  
+  return -1;
+}
+/* -------------------------------------------- */
+int GoodParticleID(int ipart, int pid)
+{
+  /* Verifying that a rec particle is well identified with PID=pid
+     ipart=row in the REC__Particle bank 
+  */
+
+  get_REC__Particle(ipart);
+  TVector3 P3(REC__Particle_px, REC__Particle_py, REC__Particle_pz);
+
+  /* Identified particles */
+  if ( (pid == 11) || (pid == 0) || (pid == -1) ) {
+    if ( (REC__Particle_pid == 11) && (P3.Mag() > PminElectron) ) return 1;
+    //else return 0;
+  }
+
+  if ( (pid == 211) || (pid == 0) || (pid == 1) ) {
+    if ( (REC__Particle_pid == 211) && (P3.Mag() > PminPion) ) return 1;
+    //else return 0;
+  }
+
+  if ( (pid == -211) || (pid == 0) || (pid == -1) ) {
+    if ( (REC__Particle_pid == -211) && (P3.Mag() > PminPion) ) return 1;
+    //else return 0;
+  }
+
+
+  
+  return 0;
+}
+/* -------------------------------------------- */
+int GoodRichPhoton(int photon_index)
+{
+  get_RICH__photons(photon_index);
+
+  if (RICH__photons_type != 0) return 0;
+
+  if (RICH__photons_traced_EtaC == 0) return 0;
+
+  if (RICH__photons_traced_the == 0) return 0;
+  if (RICH__photons_traced_phi == 0) return 0;
+
+  return 1;
 }
