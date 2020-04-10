@@ -70,7 +70,6 @@ TString timeoffset_file = "";
 #include "Clas12Detectors.h"
 #include <RichTimeCorr.h>
 
-
 /* ================================================================ */
 int GoodRichParticle(int richhadron_index);
 int GoodParticleID(int ipart, int pid);
