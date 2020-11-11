@@ -6,14 +6,14 @@ import subprocess
 
 RICHTIMECALIB = os.getenv("RICHTIMECALIB")
 if RICHTIMECALIB == "":
-    print "environment variable $RICHTIMECALIB must be set to"
-    print "the location of the time calibration suite. setenv RICHTIMECALIB `pwd`"
+    print ("environment variable $RICHTIMECALIB must be set to")
+    print ("the location of the time calibration suite. setenv RICHTIMECALIB `pwd`")
     exit(1)
 
 RICHTIMECALIB_OUTPATH = os.getenv("RICHTIMECALIB_OUTPATH")
 if RICHTIMECALIB_OUTPATH == "":
-    print "environment variable $RICHTIMECALIB_OUTPATH must be set to"
-    print "the location of the time calibration suite."
+    print ("environment variable $RICHTIMECALIB_OUTPATH must be set to")
+    print ("the location of the time calibration suite.")
     exit(1)
 
 ############## global setting ###########
@@ -36,8 +36,8 @@ MAXJOBS = 2
 #################################################
 def checkdir(path):
     if not os.path.isdir(path):
-        print "The directory " + path + " does not exist"
-        print "creating it"
+        print ("The directory " + path + " does not exist")
+        print ("creating it")
         cmd = "mkdir -p " + path
         subprocess.call(cmd,shell=True)
         return 0
@@ -168,17 +168,17 @@ def run_wf():
 def main():
     global WF, RN, outdir_pref, MAXJOBS, BS
     if len(argv)!=3: 
-        print "A directory with calibration files or filelist must be supplied together with a run number"
-        print argv[0] + " filelist.txt <RN>"
+        print ("A directory with calibration files or filelist must be supplied together with a run number")
+        print (argv[0] + " filelist.txt <RN>")
         exit (1)
     if not os.path.exists(argv[1]):
-        print "The file or path " + argv[1] + " does not exist"
+        print ("The file or path " + argv[1] + " does not exist")
         exit (1)
 
     try:
         RN = int(argv[2])
     except ValueError:
-        print "The run number must be an integer!. You supplied " + argv[2]
+        print ("The run number must be an integer!. You supplied " + argv[2])
         exit(0)
 
     if RN == 0:
@@ -195,7 +195,7 @@ def main():
     elif os.path.isfile(argv[1]):
         flist_flat = import_flist(argv[1])
     else:
-        print argv[1] + " is not a file nor a directory."
+        print (argv[1] + " is not a file nor a directory.")
 
     #### making a nested file list with maximum BS file per bunch ####
     flist = [flist_flat[x*BS:(x+1)*BS] for x in range( -(-len(flist_flat) // BS ) )]
