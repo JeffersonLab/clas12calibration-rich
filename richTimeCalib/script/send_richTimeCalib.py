@@ -68,7 +68,7 @@ def add_hist_job(wf,fnl,phase=0,c=0):
     size = 100
     for fname in fnl:
         size += os.path.getsize(fname)/1024./1024.*1.15
-    cmd  = "swif add-job -workflow " + wf + " -ram 9000mb -project clas12 -time 6h -disk " + "{0:.0f}".format(size) + "mb "
+    cmd  = "swif add-job -workflow " + wf + " -ram 1000mb -project clas12 -time 6h -disk " + "{0:.0f}".format(size) + "mb "
     cmd += " -track "+ TRACK
     cmd += " -phase " + str(phase)
     cmd += " -name " + jname
@@ -102,7 +102,7 @@ def add_hist_job(wf,fnl,phase=0,c=0):
 def add_ana_job(wf,flist,phase=0):
     global outdir_pref, aBin, aScript, RN, envscript
     size = 24*len(flist)*1.15
-    cmd  = "swif add-job -workflow " + wf + " -ram 9000mb -project clas12 -time 6h -disk " + "{0:.0f}".format(size) + "mb "
+    cmd  = "swif add-job -workflow " + wf + " -ram 1000mb -project clas12 -time 6h -disk " + "{0:.0f}".format(size) + "mb "
     cmd += " -track "+ TRACK
     cmd += " -phase " + str(phase)
     cmd += " -shell /bin/bash" 
