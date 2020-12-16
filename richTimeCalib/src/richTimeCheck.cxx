@@ -145,7 +145,6 @@ int main(int argc, char *argv[])
   /* with correction */
   sprintf(hname, "hDTimeCorr");
   TH2F *hDTimeCorr = (TH2F*)fHist->Get(hname);
-
   
   /* =================== */
   /* 2D plots of Delta L */
@@ -339,14 +338,19 @@ int main(int argc, char *argv[])
   /* PLOTS of the time distributions */
   c1->cd(1);
   gStyle->SetOptStat(0);
+  
+  TH1F *h;
 
   /* no correction */
   c1->SetLogz();
+  hDTime->RebinX(nANODES);
+  hDTime->RebinY(2);
   hDTime->Draw("colz");
   c1->Print(Form("%s", fname));
 
   /* with correction */
   c1->SetLogz();
+  hDTimeCorr->RebinX(nANODES);
   hDTimeCorr->Draw("colz");
   c1->Print(Form("%s", fname));
 
