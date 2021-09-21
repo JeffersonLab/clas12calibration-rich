@@ -2,7 +2,6 @@
 This package contains a set of tools to extract time calibration parameters for the CLAS12 RICH detector.
 
 ## Requirement
-* Hipo4 c++ installed and environments variables ```HIPO4LIB``` and  ```HIPO4INC``` pointing to the path with the hipo4 library and headers (*.h) respectively
 * Root version >= 5.34
 
 ## Getting ready for running on farm
